@@ -47,12 +47,11 @@ local function setup(opts)
 			end
 		end
 	end)
-	vim.keymap.set({ "i" }, dmacro_key, function()
+	vim.keymap.set({ "i", "n" }, dmacro_key, function()
 		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history, 1, #vim.b.dmacro_history - 1)
 		local completion = vim.b.prev_completion
 		completion = completion or guess_completion_1()
 		if completion then
-			print("play: " .. table.concat(vim.fn.reverse(completion)))
 			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
 			vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
 			vim.b.prev_completion = completion
@@ -60,7 +59,6 @@ local function setup(opts)
 		end
 		completion = completion or guess_completion_2()
 		if completion then
-			print("play: " .. table.concat(vim.fn.reverse(completion)))
 			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
 			vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
 			vim.b.prev_completion = nil
