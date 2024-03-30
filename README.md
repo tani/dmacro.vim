@@ -37,7 +37,7 @@ You can specify a `dmacro_key` option
 
 ```lua
 require('dmacro').setup({
-    dmacro_key = '<leader>. -- this is a default
+    dmacro_key = '<leader>.' -- this is a default
 })
 ```
 
