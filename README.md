@@ -12,7 +12,7 @@
 ## Example
 
 This plugin defines a macro dynamically.
-**You do not need to make mark for dot-repeat.**
+**You do not need to make marks for the macro.**
 To define a macro, this plugin detect the reputation as follows:
 
 - If you type the same key sequence twice (e.g., `abcabc`), then this plugin defines a macro with the key sequence (e.g., `abc`).
