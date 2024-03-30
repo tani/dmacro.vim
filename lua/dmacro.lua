@@ -1,67 +1,72 @@
-local this_group = vim.api.nvim_create_augroup('dmacro', {})
-local this_namespace = vim.api.nvim_create_namespace('dmacro')
-
-local function drop(tbl, start)
-    local ret = {}
-    for i = start, #tbl - 1 do
-        table.insert(ret, tbl[i])
-    end
-    return ret
+local function guess_completion_1()
+	local hist = vim.fn.reverse(vim.b.dmacro_history)
+	for i = math.floor(#hist / 2), 1, -1 do
+		local span = vim.list_slice(hist, 1, i)
+		local spanspan = vim.fn.extend(span, span)
+		local double = vim.list_slice(hist, 1, i * 2)
+        if vim.deep_equal(double, spanspan) then
+            return span
+        end
+	end
+    return nil
 end
 
-local function take(tbl, _end)
-    local ret = {}
-    for i = 0, _end do
-        table.insert(ret, tbl[i])
-    end
-    return ret
-end
-
-local function merge(a, b)
-    local ret = {}
-    for _, e in ipairs(a) do
-        table.insert(ret, e)
-    end
-    for _, e in ipairs(b) do
-        table.insert(ret, e)
-    end
-    return ret
-end
-
-local function equal(a, b)
-    if #a == #b then
-        for i = 0, #a - 1 do
-            if a[i] ~= b[i] then
-                return false
+local function guess_completion_2()
+	local hist = vim.fn.reverse(vim.b.dmacro_history)
+    for i = math.floor(#hist / 2), 1, -1 do
+        local span = vim.list_slice(hist, 1, i)
+        for j = #span, #hist - #span do
+            local prevspan = vim.list_slice(hist, j + 1, j + #span)
+            if vim.deep_equal(prevspan, span) then
+                return vim.list_slice(hist, #span + 1, j)
             end
         end
-        return true
     end
-    return false
+    return nil
 end
 
-local function repeat_dmacro()
-    local hist = { unpack(vim.fn.slice(vim.fn.reverse(vim.b.dmacro_history), 1)) }
-    for i = 0, (#hist / 2) do
-       vim.print({take(hist, i * 2), merge(take(hist, i), take(hist, i)) })
-       if equal(take(hist, i * 2), merge(take(hist, i), take(hist, i))) then
-            vim.print(take(hist, i * 2))
-       end
-    end
-end
-
-local function init_dmacro()
-    vim.b.dmacro_history = {}
+local function setup(opts)
+    opts = opts or {}
+    local dmacro_key = opts.dmacro_key or "<leader>."
+    local this_group = vim.api.nvim_create_augroup("dmacro", {})
+    vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = this_group,
+        callback = function()
+            vim.b.dmacro_history = {}
+            vim.b.prev_completion = nil
+        end,
+    })
     vim.on_key(function(key, typed)
-        if typed ~= "" and typed ~= nil then
-            vim.b.dmacro_history = vim.fn.add(vim.b.dmacro_history, typed)
+		if typed ~= "" and typed ~= nil then
+			vim.b.dmacro_history = vim.fn.add(vim.b.dmacro_history, typed)
+            if typed ~= dmacro_key:gsub("<leader>", [[\]]) then
+                if vim.b.prev_completion then
+                    vim.b.prev_completion = nil
+                    vim.b.dmacro_history = {}
+                end
+            end
+		end
+    end)
+	vim.keymap.set({ "i" }, dmacro_key, function()
+        vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history, 1, #vim.b.dmacro_history - 1)
+        local completion = vim.b.prev_completion
+        completion = completion or guess_completion_1()
+        if completion then
+            print("play: " .. table.concat(vim.fn.reverse(completion)))
+            vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
+            vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
+            vim.b.prev_completion = completion
+            return
         end
-    end, this_namespace)
-    vim.keymap.set({"i"}, "<leader>t", repeat_dmacro, { buffer = true })
-    print("dmacro is initialized")
+        completion = completion or guess_completion_2()
+        if completion then
+            print("play: " .. table.concat(vim.fn.reverse(completion)))
+            vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
+            vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
+            vim.b.prev_completion = nil
+            return
+        end
+    end)
 end
 
-vim.api.nvim_create_autocmd('BufWinEnter', {
-    group = this_group,
-    callback = init_dmacro
-})
+return { setup = setup }
