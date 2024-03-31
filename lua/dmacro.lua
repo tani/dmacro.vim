@@ -27,7 +27,10 @@ end
 
 local function setup(opts)
 	opts = opts or {}
-	local dmacro_key = opts.dmacro_key or "<leader>."
+	local dmacro_key = opts.dmacro_key
+	if not dmacro_key then
+		print('dmacro_key is undefined')
+	end
 	local this_group = vim.api.nvim_create_augroup("dmacro", {})
 	vim.api.nvim_create_autocmd("BufWinEnter", {
 		group = this_group,

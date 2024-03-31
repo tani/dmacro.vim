@@ -31,14 +31,8 @@ To define a macro, this plugin detects the reputation as follows:
 Before loading buffers, call the `setup()` function.
 
 ```lua
-require('dmacro').setup()
-```
-
-You can specify a `dmacro_key` option
-
-```lua
 require('dmacro').setup({
-    dmacro_key = '<leader>.' -- this is a default
+    dmacro_key = '<C-t>' --  you need to set the dmacro_key
 })
 ```
 
