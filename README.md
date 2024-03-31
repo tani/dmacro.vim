@@ -13,7 +13,7 @@
 ## Example
 
 This plugin dynamically defines a macro.
-**You do not need to make any markers for the macro.
+**You do not need to make any markers for the macro.**
 To define a macro, this plugin detects the reputation as follows:
 
 - If you enter the same key sequence twice (e.g. `abcabc`), this plugin will define a macro with the key sequence (e.g. `abc`).
