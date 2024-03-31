@@ -42,7 +42,7 @@ local function setup(opts)
 	vim.on_key(function(key, typed)
 		if typed ~= "" and typed ~= nil then
 			vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history)
-			if vim.fn.keytrans(typed) ~= string.upper(dmacro_key) then
+			if string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
 				if vim.b.prev_completion then
 					vim.b.prev_completion = nil
 					vim.b.dmacro_history = {}
