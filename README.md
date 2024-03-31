@@ -1,13 +1,14 @@
 # dmacro.nvim
 
 > [!CAUTION]
-> This plugin depends on the pull request https://github.com/neovim/neovim/pull/28098 .
-> You need to build neovim, which is available at https://github.com/zeertzjq/neovim/tree/on-key-typed .
+> You need to use the nightly build of neovim (3-31-2024 or later).<br>
+> <s>This plugin depends on the pull request https://github.com/neovim/neovim/pull/28098 .
+> You need to build neovim, which is available at https://github.com/zeertzjq/neovim/tree/on-key-typed . </s>
 
 ## Related works
 
 - [dmacro.el](https://github.com/emacs-jp/dmacro)
-- Dynamic Macro for Visual Studio Code](https://github.com/tshino/vscode-dynamic-macro)
+- [Dynamic Macro for Visual Studio Code](https://github.com/tshino/vscode-dynamic-macro)
 
 ## Example
 
