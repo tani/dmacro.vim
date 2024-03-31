@@ -1,5 +1,5 @@
 local function guess_completion_1()
-	local hist = vim.fn.reverse(vim.b.dmacro_history)
+	local hist = vim.b.dmacro_history
 	for i = math.floor(#hist / 2), 1, -1 do
 		local span = vim.list_slice(hist, 1, i)
 		local spanspan = vim.fn.extend(span, span)
@@ -12,7 +12,7 @@ local function guess_completion_1()
 end
 
 local function guess_completion_2()
-	local hist = vim.fn.reverse(vim.b.dmacro_history)
+	local hist = vim.b.dmacro_history
 	for i = math.floor(#hist / 2), 1, -1 do
 		local span = vim.list_slice(hist, 1, i)
 		for j = #span, #hist - #span do
@@ -38,8 +38,8 @@ local function setup(opts)
 	})
 	vim.on_key(function(key, typed)
 		if typed ~= "" and typed ~= nil then
-			vim.b.dmacro_history = vim.fn.add(vim.b.dmacro_history, typed)
-			if typed ~= dmacro_key:gsub("<leader>", [[\]]) then
+			vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history)
+			if vim.fn.keytrans(typed) ~= string.upper(dmacro_key) then
 				if vim.b.prev_completion then
 					vim.b.prev_completion = nil
 					vim.b.dmacro_history = {}
@@ -48,23 +48,22 @@ local function setup(opts)
 		end
 	end)
 	vim.keymap.set({ "i", "n" }, dmacro_key, function()
-		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history, 1, #vim.b.dmacro_history - 1)
+		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history, 2)
 		local completion = vim.b.prev_completion
 		completion = completion or guess_completion_1()
 		if completion then
 			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
-			vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
+			vim.b.dmacro_history = vim.fn.extend(completion, vim.b.dmacro_history)
 			vim.b.prev_completion = completion
 			return
 		end
 		completion = completion or guess_completion_2()
 		if completion then
 			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
-			vim.b.dmacro_history = vim.fn.extend(vim.b.dmacro_history, vim.fn.reverse(completion))
+			vim.b.dmacro_history = vim.fn.extend(completion, vim.b.dmacro_history)
 			vim.b.prev_completion = nil
 			return
 		end
 	end)
 end
-
 return { setup = setup }
