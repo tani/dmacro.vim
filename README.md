@@ -8,7 +8,7 @@
 ## Related works
 
 - [dmacro.el](https://github.com/emacs-jp/dmacro)
-- Dynamic Macro for Visual Studio Code](https://github.com/tshino/vscode-dynamic-macro)
+- [Dynamic Macro for Visual Studio Code](https://github.com/tshino/vscode-dynamic-macro)
 
 ## Example
 
