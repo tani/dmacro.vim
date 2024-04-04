@@ -12,6 +12,12 @@
 
 ## Example
 
+
+
+https://github.com/tani/dmacro.nvim/assets/5019902/e008d47d-9094-447f-abff-7aa7e4b18259
+
+
+
 This plugin dynamically defines a macro.
 **You do not need to make any markers for the macro.**
 To define a macro, this plugin detects the reputation as follows:
