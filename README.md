@@ -25,47 +25,53 @@ To define a macro, this plugin detects the reputation as follows:
 - If you enter the same key sequence twice (e.g. `abcabc`), this plugin will define a macro with the key sequence (e.g. `abc`).
   ```mermaid
   graph LR
-  start(( )) --> a1((a))
-  subgraph 1st
-  a1 --> b1((b))
-  b1 --> c1((c))
-  end
-  subgraph 2nd
-  c1 --> a2((a))
-  a2 --> b2((b))
-  b2 --> c2((c))
-  end
-  c2 --> dmacro(dmacro)
-  dmacro -.- a3((a))
-  subgraph MacroExecution
-  a3 -.- b3((b))
-  b3 -.- c3((c))
-  end
-  c3 --> quit(( ))
+    start(( )) --> a1((a))
+    subgraph 1st
+    a1 --> b1((b))
+    b1 --> c1((c))
+    end
+    subgraph 2nd
+    c1 --> a2((a))
+    a2 --> b2((b))
+    b2 --> c2((c))
+    end
+    subgraph 3rd
+    c2 --> dmacro(dmacro)
+    dmacro -.- a3((a))
+    subgraph MacroExecution
+    a3 -.- b3((b))
+    b3 -.- c3((c))
+    end
+    end
+    c3 --> quit(( ))
   ```
   
 
 - If you type the subsequence (e.g. `a`) of the previous key sequence (e.g. `abc`), this plugin will define a macro with the rest of the previous sequence (e.g. `bc`). After expanding the macro, the whole sequence (e.g. `abc`) will be the macro.
   ```mermaid
   graph LR
-  start(( )) --> a1((a))
-  subgraph 1st
-  a1 --> b1((b))
-  b1 --> c1((c))
-  end
-  subgraph 2nd
-  c1 --> a2((a))
-  a2 --> dmacro1(dmacro)
-  dmacro1 -.- b2((b))
-  b2 -.- c2((c))
-  end
-  c2 --> dmacro2(dmacro)
-  dmacro2 -.- a3((a))
-  subgraph MacroExecution
-  a3 -.- b3((b))
-  b3 -.- c3((c))
-  end
-  c3 --> quit(( ))
+    start(( )) --> a1((a))
+    subgraph 1st
+    a1 --> b1((b))
+    b1 --> c1((c))
+    end
+    subgraph 2nd
+    c1 --> a2((a))
+    a2 --> dmacro1(dmacro)
+    dmacro1 -.- b2((b))
+    subgraph MacroExecution_1
+    b2 -.- c2((c))
+    end
+    end
+    subgraph 3rd
+    c2 --> dmacro2(dmacro)
+    dmacro2 -.- a3((a))
+    subgraph MacroExecution_2
+    a3 -.- b3((b))
+    b3 -.- c3((c))
+    end
+    end
+    c3 --> quit(( ))
   ```
 
 ## Usage
