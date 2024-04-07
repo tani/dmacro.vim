@@ -27,22 +27,13 @@ end
 
 local function setup(opts)
 	opts = opts or {}
-	local dmacro_key = opts.dmacro_key
-	if not dmacro_key then
+	if not opts.dmacro_key then
 		print('dmacro_key is undefined')
 	end
-	local this_group = vim.api.nvim_create_augroup("dmacro", {})
-	vim.api.nvim_create_autocmd("BufWinEnter", {
-		group = this_group,
-		callback = function()
-			vim.b.dmacro_history = {}
-			vim.b.prev_completion = nil
-		end,
-	})
-	vim.on_key(function(key, typed)
+	vim.on_key(function(_, typed)
 		if typed ~= "" and typed ~= nil then
-			vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history)
-			if string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
+			vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history or {})
+			if string.upper(vim.fn.keytrans(typed)) ~= string.upper(opts.dmacro_key) then
 				if vim.b.prev_completion then
 					vim.b.prev_completion = nil
 					vim.b.dmacro_history = {}
@@ -50,8 +41,8 @@ local function setup(opts)
 			end
 		end
 	end)
-	vim.keymap.set({ "i", "n" }, dmacro_key, function()
-		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history, 2)
+	vim.keymap.set({ "i", "n" }, opts.dmacro_key, function()
+		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history or {}, 2)
 		local completion = vim.b.prev_completion
 		completion = completion or guess_completion_1()
 		if completion then
