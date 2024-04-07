@@ -32,12 +32,14 @@ local function setup(opts)
 		print('dmacro_key is undefined')
 	end
 	local this_group = vim.api.nvim_create_augroup('dmacro', {})
+	local function initialize()
+		vim.b.dmacro_history = {}
+		vim.b.prev_completion = nil
+	end
+	initialize()
 	vim.api.nvim_create_autocmd('BufWinEnter', {
 		group = this_group,
-		callback = function()
-			vim.b.dmacro_history = {}
-			vim.b.prev_completion = nil
-		end,
+		callback = initialize,
 	})
 	vim.on_key(function(_, typed)
 		if typed ~= '' and typed ~= nil then
