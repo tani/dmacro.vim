@@ -1,4 +1,6 @@
-local function guess_completion_1()
+local dmacro_key = nil
+
+local function guess_macro_1()
 	local hist = vim.b.dmacro_history
 	for i = math.floor(#hist / 2), 1, -1 do
 		local span = vim.list_slice(hist, 1, i)
@@ -11,7 +13,7 @@ local function guess_completion_1()
 	return nil
 end
 
-local function guess_completion_2()
+local function guess_macro_2()
 	local hist = vim.b.dmacro_history
 	for i = math.floor(#hist / 2), 1, -1 do
 		local span = vim.list_slice(hist, 1, i)
@@ -25,39 +27,45 @@ local function guess_completion_2()
 	return nil
 end
 
-local function setup(opts)
-	opts = opts or {}
-	if not opts.dmacro_key then
-		print('dmacro_key is undefined')
-	end
-	vim.on_key(function(_, typed)
-		if typed ~= "" and typed ~= nil then
-			vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history or {})
-			if string.upper(vim.fn.keytrans(typed)) ~= string.upper(opts.dmacro_key) then
-				if vim.b.prev_completion then
-					vim.b.prev_completion = nil
-					vim.b.dmacro_history = {}
-				end
+local function record_macro(_, typed)
+	if typed ~= "" and typed ~= nil then
+		vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history or {})
+		if string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
+			if vim.b.prev_macro then
+				vim.b.prev_macro = nil
+				vim.b.dmacro_history = {}
 			end
 		end
-	end)
-	vim.keymap.set({ "i", "n" }, opts.dmacro_key, function()
-		vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history or {}, 2)
-		local completion = vim.b.prev_completion
-		completion = completion or guess_completion_1()
-		if completion then
-			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
-			vim.b.dmacro_history = vim.fn.extend(completion, vim.b.dmacro_history)
-			vim.b.prev_completion = completion
-			return
-		end
-		completion = completion or guess_completion_2()
-		if completion then
-			vim.fn.feedkeys(table.concat(vim.fn.reverse(completion)))
-			vim.b.dmacro_history = vim.fn.extend(completion, vim.b.dmacro_history)
-			vim.b.prev_completion = nil
-			return
-		end
-	end)
+	end
 end
+
+local function play_macro()
+	vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history or {}, 2)
+	local macro = vim.b.prev_macro
+	macro = macro or guess_macro_1()
+	if macro then
+		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
+		vim.b.dmacro_history = vim.fn.extend(macro, vim.b.dmacro_history)
+		vim.b.prev_macro = macro
+		return
+	end
+	macro = macro or guess_macro_2()
+	if macro then
+		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
+		vim.b.dmacro_history = vim.fn.extend(macro, vim.b.dmacro_history)
+		vim.b.prev_macro = nil
+		return
+	end
+end
+
+local function setup(opts)
+	opts = opts or {}
+	dmacro_key = opts.dmacro_key
+	if not dmacro_key then
+		print('dmacro_key is undefined')
+	end
+	vim.on_key(record_macro)
+	vim.keymap.set({ "i", "n" }, dmacro_key, play_macro)
+end
+
 return { setup = setup }
