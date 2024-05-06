@@ -5,6 +5,18 @@
 > <s>This plugin depends on the pull request https://github.com/neovim/neovim/pull/28098 .
 > You need to build neovim, which is available at https://github.com/zeertzjq/neovim/tree/on-key-typed . </s>
 
+Text editors have evolved to support input in different ways.
+
+- Word completion based on dictionary data (e.g. CTRL-X completion in Vim)
+- Code fragment completion based on dictionary data (e.g. Snippet Completion)
+- Contextual, rule-based word completion (e.g. Language Server Protocol)
+- Completion of larger code fragments using generative AI (GitHub Copilot)
+
+All of these were hailed as revolutionary when they first appeared.
+What's the next big assistive feature? I say **operation completion**.
+Currently, completion is for new code. But most coding isn't new creation.
+It's overwriting, like editing or updating. Shouldn't this be supported?
+
 ## Related works
 
 - [dmacro.el](https://github.com/emacs-jp/dmacro)
