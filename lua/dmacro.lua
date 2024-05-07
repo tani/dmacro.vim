@@ -31,8 +31,8 @@ local function record_macro(_, typed)
 	if typed ~= "" and typed ~= nil then
 		vim.b.dmacro_history = vim.fn.extend({ typed }, vim.b.dmacro_history or {})
 		if string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
-			if vim.b.prev_macro then
-				vim.b.prev_macro = nil
+			if vim.b.dmacro_prev_macro then
+				vim.b.dmacro_prev_macro = nil
 				vim.b.dmacro_history = {}
 			end
 		end
@@ -41,19 +41,19 @@ end
 
 local function play_macro()
 	vim.b.dmacro_history = vim.list_slice(vim.b.dmacro_history or {}, 2)
-	local macro = vim.b.prev_macro
+	local macro = vim.b.dmacro_prev_macro
 	macro = macro or guess_macro_1()
 	if macro then
 		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
 		vim.b.dmacro_history = vim.fn.extend(macro, vim.b.dmacro_history)
-		vim.b.prev_macro = macro
+		vim.b.dmacro_prev_macro = macro
 		return
 	end
 	macro = macro or guess_macro_2()
 	if macro then
 		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
 		vim.b.dmacro_history = vim.fn.extend(macro, vim.b.dmacro_history)
-		vim.b.prev_macro = nil
+		vim.b.dmacro_prev_macro = nil
 		return
 	end
 end
