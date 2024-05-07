@@ -1,0 +1,53 @@
+dmacro.txt
+==============================================================================
+*dm* *dmacro.txt*	Documentation for dmacro.vim plugin
+
+Author:		Masaya Taniguchi
+
+------------------------------------------------------------------------------
+
+INTRODUCTION                                                     *dmacro-intro*
+
+Text editors have evolved to support input in different ways.
+
+- Word completion based on dictionary data (e.g. CTRL-X completion in Vim)
+- Code fragment completion based on dictionary data (e.g. Snippet Completion)
+- Contextual, rule-based word completion (e.g. Language Server Protocol)
+- Completion of larger code fragments using generative AI (GitHub Copilot)
+
+All of these were hailed as revolutionary when they first appeared.
+What's the next big assistive feature? I say **operation completion**.
+Currently, completion is for new code. But most coding isn't new creation.
+It's overwriting, like editing or updating. Shouldn't this be supported?
+
+RELATED WORKS                                                   *dmacro-related*
+
+- dmacro.el (Emacs) https://github.com/emacs-jp/dmacro
+- Dynacmic Macro for Visual Studio Code https://github.com/tshino/vscode-dynamic-macro
+
+This plugin dynamically defines a macro.
+You do not need to make any markers for the macro.
+To define a macro, this plugin detects the reputation as follows:
+
+- If you enter the same key sequence twice (e.g. `abcabc`),
+  this plugin will define a macro with the key sequence (e.g. `abc`).
+
+- If you type the subsequence (e.g. `a`) of the previous key sequence (e.g. `abc`),
+  this plugin will define a macro with the rest of the previous
+  sequence (e.g. `bc`). After expanding the macro, the whole sequence (e.g. `abc`)
+  will be the macro.
+
+USAGE                                                             *dmacro-usage*
+
+Before loading buffers, call the `setup()` function.
+>
+  require('dmacro').setup({
+      dmacro_key = '<C-t>' --  you need to set the dmacro_key
+  })
+<
+
+LICENSE                                                         *dmacro-license*
+
+This software is released under the MIT licence.
+
+:vim:tw=78:ts=8:ft=help:norl:
