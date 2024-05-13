@@ -24,11 +24,7 @@ It's overwriting, like editing or updating. Shouldn't this be supported?
 
 ## Example
 
-
-
-https://github.com/tani/dmacro.nvim/assets/5019902/e008d47d-9094-447f-abff-7aa7e4b18259
-
-
+[dmacro.webm](https://github.com/tani/dmacro.nvim/assets/5019902/7190245b-3c48-4170-bd41-6df781f21feb)
 
 This plugin dynamically defines a macro.
 **You do not need to make any markers for the macro.**
