@@ -67,14 +67,14 @@ end
 -- @param macro the previous macro to be set.
 function _M.set_state(keys, macro)
 	vim.b.dmacro_keys = keys
-	vim.b.dmacro_prev_macro = macro
+	vim.b.dmacro_macro = macro
 end
 
 --- Get the current state of dmacro.
 -- This function retrieves the current keys and previous macro of dmacro from the buffer.
 -- @return two values: the current keys you have typed and the previous macro.
 function _M.get_state()
-	return vim.b.dmacro_keys, vim.b.dmacro_prev_macro
+	return vim.b.dmacro_keys, vim.b.dmacro_macro
 end
 
 --- Setup function for dmacro.
