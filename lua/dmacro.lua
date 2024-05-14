@@ -1,9 +1,12 @@
 local _M = {}
 
-local function guess_macro_1(keys)
+--- Guess the macro from the keys.
+-- @param keys A table of keys to guess the macro from.
+-- @return A table representing the guessed macro, or nil if no macro could be guessed.
+function _M.guess_macro_1(keys)
 	for i = math.floor(#keys / 2), 1, -1 do
 		local span = vim.list_slice(keys, 1, i)
-		local spanspan = vim.fn.extend(span, span)
+		local spanspan = vim.list_extend({ unpack(span) }, { unpack(span) })
 		local double = vim.list_slice(keys, 1, i * 2)
 		if vim.deep_equal(double, spanspan) then
 			return span
@@ -12,7 +15,10 @@ local function guess_macro_1(keys)
 	return nil
 end
 
-local function guess_macro_2(keys)
+--- Guess the macro from the keys.
+-- @param keys A table of keys to guess the macro from.
+-- @return A table representing the guessed macro, or nil if no macro could be guessed.
+function _M.guess_macro_2(keys)
 	for i = math.floor(#keys / 2), 1, -1 do
 		local span = vim.list_slice(keys, 1, i)
 		for j = #span, #keys - #span do
@@ -33,7 +39,7 @@ function _M.create_macro_recorder(dmacro_key)
 	return function(_, typed)
 		if typed ~= "" and typed ~= nil then
 			local keys, macro = _M.get_state()
-			_M.set_state(vim.fn.extend({ typed }, keys or {}), macro)
+			_M.set_state(vim.list_extend({ typed }, keys or {}), macro)
 			if macro and string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
 				_M.set_state({}, nil)
 			end
