@@ -1,13 +1,25 @@
 local _M = {}
 
 --- Guess the macro from the keys.
+--- keys: { old --> new }, find the repeated pattern: { ..., <pattern>, <pattern> }
 -- @param keys A table of keys to guess the macro from.
 -- @return A table representing the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_1(keys)
-	for i = math.floor(#keys / 2), 1, -1 do
-		local span = vim.list_slice(keys, 1, i)
+	-- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, #keys = 7
+	for i = math.ceil(#keys / 2), #keys do
+		-- (1) i = math.celi(#keys / 2) = 4
+		-- (2) i = 5
+		local span = vim.list_slice(keys, i, #keys)
+		-- (1) span = { 'a', c', 'b', 'a' }
+		-- (2) span = { 'c', 'b', 'a' }
 		local spanspan = vim.list_extend({ unpack(span) }, { unpack(span) })
-		local double = vim.list_slice(keys, 1, i * 2)
+		-- (1) spanspan = {  'a', 'c', 'b', 'a', 'a',  'c', 'b', 'a' }
+		-- (2) spanspan = { 'c', 'b', 'a', 'c', 'b', 'a' }
+		local double = vim.list_slice(keys, math.max(1, i - (#span)), #keys)
+		-- (1) i - #span = 4 - 4 = 0 -> 1
+		--     double = vim.slice(keys, 1, 7) = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
+		-- (2) i - #span = 5 - 3 = 2
+		-- 	 double = vim.slice(keys, 2, 7) = { 'c', 'b', 'a', 'c', 'b', 'a' }
 		if vim.deep_equal(double, spanspan) then
 			return span
 		end
@@ -16,15 +28,29 @@ function _M.guess_macro_1(keys)
 end
 
 --- Guess the macro from the keys.
+--- keys: { old --> new }, find the completion between repeated pattern: { ..., <pattern>, <completion>, <pattern> }
 -- @param keys A table of keys to guess the macro from.
 -- @return A table representing the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_2(keys)
-	for i = math.floor(#keys / 2), 1, -1 do
-		local span = vim.list_slice(keys, 1, i)
-		for j = #span, #keys - #span do
-			local prevspan = vim.list_slice(keys, j + 1, j + #span)
+	-- keys = { 'd', 'c', 'b', 'a', 'c', 'b' }, #keys = 6
+	for i = math.ceil(#keys / 2), #keys do
+		-- (1) i = math.ceil(#keys / 2) = 3
+		-- (2) i = 4
+		local span = vim.list_slice(keys, i + 1, #keys)
+		-- (1) span = { 'a', 'c', 'b' }
+		-- (2) span = { 'c', 'b' }
+		for j = i, #span, -1  do
+			-- (1 - 1) j = 3
+			-- (2 - 1) j = 4
+			-- (2 - 2) j = 3
+			local prevspan = vim.list_slice(keys, j - #span + 1, j)
+			-- (1 - 1) prevspan = vim.list_slice(keys, 3 - 3 + 1 = 1, 3) = { 'd', 'c', 'b' }
+			-- (2 - 1) prevspan = vim.list_slice(keys, 4 - 2 + 1 = 3, 4) = { 'a', 'c' }
+			-- (2 - 2) prevspan = vim.list_slice(keys, 3 - 2 + 1 = 2, 3) = { 'c', 'b' }
 			if vim.deep_equal(prevspan, span) then
-				return vim.list_slice(keys, #span + 1, j)
+				-- (2 - 2) true
+				return vim.list_slice(keys, j + 1, i)
+				-- (2 - 2) vim.list_slice(keys, 3 + 1 = 4, 4) = { 'a' }
 			end
 		end
 	end
@@ -39,7 +65,7 @@ function _M.create_macro_recorder(dmacro_key)
 	return function(_, typed)
 		if typed ~= "" and typed ~= nil then
 			local keys, macro = _M.get_state()
-			_M.set_state(vim.list_extend({ typed }, keys or {}), macro)
+			_M.set_state(vim.list_extend({ unpack(keys or {}) }, { typed }), macro)
 			if macro and string.upper(vim.fn.keytrans(typed)) ~= string.upper(dmacro_key) then
 				_M.set_state({}, nil)
 			end
@@ -54,15 +80,15 @@ end
 -- @param macro the macro to be played. If nil, the function will try to guess the macro.
 -- @return two values: the updated keys and the played macro. If no macro was played, the second return value is nil.
 function _M.play_macro(keys, macro)
-	macro = macro or guess_macro_1(keys)
+	macro = macro or _M.guess_macro_1(keys)
 	if macro then
-		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
-		return vim.fn.extend(macro, keys), macro
+		vim.fn.feedkeys(table.concat(macro))
+		return vim.list_extend({ unpack(keys) }, { unpack(macro) }), macro
 	end
-	macro = macro or guess_macro_2(keys)
+	macro = macro or _M.guess_macro_2(keys)
 	if macro then
-		vim.fn.feedkeys(table.concat(vim.fn.reverse(macro)))
-		return vim.fn.extend(macro, keys), nil
+		vim.fn.feedkeys(table.concat(macro))
+		return vim.list_extend({ unpack(keys) }, { unpack(macro) }), nil
 	end
 	return keys, nil
 end
@@ -97,7 +123,7 @@ function _M.setup(opts)
 	vim.on_key(_M.create_macro_recorder(opts.dmacro_key))
 	vim.keymap.set({ "i", "n" }, opts.dmacro_key, function()
 		local keys, macro = _M.get_state()
-		keys, macro = _M.play_macro(vim.list_slice(keys, 2), macro)
+		keys, macro = _M.play_macro(vim.list_slice(keys, 1, #keys - 1), macro)
 		_M.set_state(keys, macro)
 	end)
 end

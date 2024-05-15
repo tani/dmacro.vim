@@ -7,14 +7,14 @@ function test(name, func)
 end
 
 test('guess_macro_1', function()
-  local keys = { 'a', 'b', 'c', 'a', 'b', 'c', 'd' }
-  local expected = {'a', 'b', 'c'}
+  local keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
+  local expected = { 'c', 'b', 'a' }
   local actual = dmacro.guess_macro_1(keys)
   assert(vim.deep_equal(expected, actual))
 end)
 
 test('guess_macro_2', function()
-  local keys = { 'b', 'c', 'a', 'b', 'c', 'd' }
+  local keys = { 'd', 'c', 'b', 'a', 'c', 'b' }
   local expected = { 'a' }
   local actual = dmacro.guess_macro_2(keys)
   assert(vim.deep_equal(expected, actual))
@@ -48,7 +48,7 @@ test('create_macro_recoder', function()
   dmacro.set_state(keys, macro)
   recorder(_, 'a')
   actual_keys, actual_macro = dmacro.get_state()
-  expected_keys = { 'a', 'a', 'b', 'c', 'a', 'b', 'c', 'd' }
+  expected_keys = { 'a', 'b', 'c', 'a', 'b', 'c', 'd', 'a' }
   expected_macro = nil
   assert(vim.deep_equal(expected_keys, actual_keys))
   assert(vim.deep_equal(expected_macro, actual_macro))

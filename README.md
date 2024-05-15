@@ -107,7 +107,7 @@ vim.keymap.set({ "i", "n" }, dmacro_key, function()
   -- macro is a key sequence that you previously played
   local keys, macro = dmacro.get_state()
   -- Drop the first key (`dmacro_key`)
-  keys, macro = dmacro.play_macro(vim.list_slice(keys, 2), macro)
+  keys, macro = dmacro.play_macro(vim.list_slice(keys, 1, #keys - 1), macro)
   dmacro.set_state(keys, macro)
 end)
 ```
