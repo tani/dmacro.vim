@@ -7,18 +7,13 @@ local _M = {}
 function _M.guess_macro_1(keys)
 	-- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, #keys = 7
 	for i = math.ceil(#keys / 2), #keys do
-		-- (1) i = math.celi(#keys / 2) = 4
-		-- (2) i = 5
-		local span = vim.list_slice(keys, i, #keys)
-		-- (1) span = { 'a', c', 'b', 'a' }
-		-- (2) span = { 'c', 'b', 'a' }
+		-- (1) i = math.ceil(#keys / 2) = 4
+		local span = vim.list_slice(keys, i + 1, #keys)
+		-- (1) span =  { 'c', 'b', 'a' }
 		local spanspan = vim.list_extend({ unpack(span) }, { unpack(span) })
-		-- (1) spanspan = {  'a', 'c', 'b', 'a', 'a',  'c', 'b', 'a' }
-		-- (2) spanspan = { 'c', 'b', 'a', 'c', 'b', 'a' }
-		local double = vim.list_slice(keys, math.max(1, i - (#span)), #keys)
-		-- (1) i - #span = 4 - 4 = 0 -> 1
-		--     double = vim.slice(keys, 1, 7) = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
-		-- (2) i - #span = 5 - 3 = 2
+		-- (1) spanspan = { 'c', 'b', 'a', 'c', 'b', 'a' }
+		local double = vim.list_slice(keys, i + 1 - #span, #keys)
+		-- (1) i - #span = 4 - 3 = 2
 		-- 	 double = vim.slice(keys, 2, 7) = { 'c', 'b', 'a', 'c', 'b', 'a' }
 		if vim.deep_equal(double, spanspan) then
 			return span
