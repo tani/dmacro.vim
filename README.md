@@ -1,7 +1,7 @@
 # dmacro.nvim
 
 > [!CAUTION]
-> You need to use nightly **0.10.0** or late.
+> You need to use neovim **0.10.0** or later.
 
 Text editors have evolved to support input in different ways.
 
