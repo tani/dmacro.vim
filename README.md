@@ -1,9 +1,7 @@
 # dmacro.nvim
 
 > [!CAUTION]
-> You need to use the nightly build of neovim (3-31-2024 or later).<br>
-> <s>This plugin depends on the pull request https://github.com/neovim/neovim/pull/28098 .
-> You need to build neovim, which is available at https://github.com/zeertzjq/neovim/tree/on-key-typed . </s>
+> You need to use neovim **0.10.0** or later.
 
 Text editors have evolved to support input in different ways.
 
@@ -91,6 +89,23 @@ require('dmacro').setup({
     dmacro_key = '<C-t>' --  you need to set the dmacro_key
 })
 ```
+
+Or, you can use as follows:
+
+```lua
+local dmacro = require('dmacro')
+local dmacro_key = '<C-t>'
+vim.on_key(dmacro.create_macro_recorder(dmacro_key))
+vim.keymap.set({ "i", "n" }, dmacro_key, function()
+  -- keys is a list of keys that you have typed
+  -- macro is a key sequence that you previously played
+  local keys, macro = dmacro.get_state()
+  -- Drop the first key (`dmacro_key`)
+  keys, macro = dmacro.play_macro(vim.list_slice(keys, 1, #keys - 1), macro)
+  dmacro.set_state(keys, macro)
+end)
+```
+
 
 ## Licence
 
