@@ -1,9 +1,7 @@
 # dmacro.nvim
 
 > [!CAUTION]
-> You need to use the nightly build of neovim (3-31-2024 or later).<br>
-> <s>This plugin depends on the pull request https://github.com/neovim/neovim/pull/28098 .
-> You need to build neovim, which is available at https://github.com/zeertzjq/neovim/tree/on-key-typed . </s>
+> You need to use nightly **0.10.0** or late.
 
 Text editors have evolved to support input in different ways.
 
