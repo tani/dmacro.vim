@@ -8,15 +8,12 @@ function _M.guess_macro_1(keys)
 	-- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, #keys = 7
 	for i = math.ceil(#keys / 2), #keys do
 		-- (1) i = math.ceil(#keys / 2) = 4
-		local span = vim.list_slice(keys, i + 1, #keys)
-		-- (1) span =  { 'c', 'b', 'a' }
-		local spanspan = vim.list_extend({ unpack(span) }, { unpack(span) })
-		-- (1) spanspan = { 'c', 'b', 'a', 'c', 'b', 'a' }
-		local double = vim.list_slice(keys, i + 1 - #span, #keys)
-		-- (1) i - #span = 4 - 3 = 2
-		-- 	 double = vim.slice(keys, 2, 7) = { 'c', 'b', 'a', 'c', 'b', 'a' }
-		if vim.deep_equal(double, spanspan) then
-			return span
+		local span1 = vim.list_slice(keys, i + 1, #keys)
+		-- (1) span1 =  { 'c', 'b', 'a' }
+		local span2 = vim.list_slice(keys, i + 1 - #span1, i)
+		-- (1) span2 = { 'c', 'b', 'a' }
+		if vim.deep_equal(span1, span2) then
+			return span1
 		end
 	end
 	return nil
