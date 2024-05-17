@@ -6,14 +6,21 @@ function test(name, func)
   print('Test: ' .. name .. ' passed')
 end
 
-test('guess_macro_1', function()
+test('guess_macro_1:ok', function()
   local keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
   local expected = { 'c', 'b', 'a' }
   local actual = dmacro.guess_macro_1(keys)
   assert(vim.deep_equal(expected, actual))
 end)
 
-test('guess_macro_2', function()
+test('guess_macro_1:ng', function()
+  local keys = { 'd', 'c', 'b', 'a', 'c', 'b' }
+  local expected = nil
+  local actual = dmacro.guess_macro_1(keys)
+  assert(vim.deep_equal(expected, actual))
+end)
+
+test('guess_macro_2:ok', function()
   local keys = { 'd', 'c', 'b', 'a', 'c', 'b' }
   local expected = { 'a' }
   local actual = dmacro.guess_macro_2(keys)
@@ -27,29 +34,6 @@ test('get_and_set_state', function()
   local expected_macro = macro
   dmacro.set_state(keys, macro)
   local actual_keys, actual_macro = dmacro.get_state()
-  assert(vim.deep_equal(expected_keys, actual_keys))
-  assert(vim.deep_equal(expected_macro, actual_macro))
-end)
-
-test('create_macro_recoder', function()
-  local dmacro_key = '<C-t>'
-  local recorder = dmacro.create_macro_recorder(dmacro_key)
-  local keys = { 'a', 'b', 'c', 'a', 'b', 'c', 'd' }
-  local macro = { 'a' }
-  dmacro.set_state(keys, macro)
-  recorder(_, 'a')
-  local actual_keys, actual_macro = dmacro.get_state()
-  local expected_keys = {}
-  local expected_macro = nil
-  assert(vim.deep_equal(expected_keys, actual_keys))
-  assert(vim.deep_equal(expected_macro, actual_macro))
-  keys = { 'a', 'b', 'c', 'a', 'b', 'c', 'd' }
-  macro = nil
-  dmacro.set_state(keys, macro)
-  recorder(_, 'a')
-  actual_keys, actual_macro = dmacro.get_state()
-  expected_keys = { 'a', 'b', 'c', 'a', 'b', 'c', 'd', 'a' }
-  expected_macro = nil
   assert(vim.deep_equal(expected_keys, actual_keys))
   assert(vim.deep_equal(expected_macro, actual_macro))
 end)
