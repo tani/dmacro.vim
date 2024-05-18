@@ -100,14 +100,13 @@ Or, you can intensively use `dmacro.setup()` in the `CursorHold` event.
 ```lua
 vim.api.nvim_create_autocmd("CursorHold", {
     callback = function()
-        local dmacro = require('dmacro')
-        dmacro.setup()
-        vim.keymap.set({ "i", "n" }, '<C-t>', dmacro.play_macro)
-        -- or
-        -- vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
+        require('dmacro').setup()
     end,
     once = true
 })
+vim.keymap.set({ "i", "n" }, '<C-t>', function() require('dmacro').play_macro() end)
+-- vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
+-- vim.keymap.set({ "i", "n" }, '<C-t>', "<Cmd>lua require('dmacro').play_macro()<CR>")
 ```
 
 ## Licence
