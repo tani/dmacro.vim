@@ -65,49 +65,6 @@ function _M.get_state()
 	return vim.b.dmacro_keys, vim.b.dmacro_macro
 end
 
---- Detects the key mapped to the dmacro function.
--- This function iterates over all the keymaps in the current mode and returns the key that is mapped to the dmacro function.
--- The comparison is case-insensitive.
--- If no such key is found, an error is thrown.
--- @return The key mapped to the dmacro function.
-local function detect_dmacro_key()
-	local keymap = vim.api.nvim_get_keymap(vim.api.nvim_get_mode().mode)
-	for _, k in ipairs(keymap) do
-		if string.upper(k.rhs or "") == string.upper('<Plug>(dmacro)') then
-			return k.lhs
-		end
-	end
-	error("dmacro_key not found")
-end
-
---- Splits a sequence of keys into individual parts.
--- This function takes a sequence of keys and splits it into individual parts.
--- Each part is either a single character or a sequence of characters enclosed in '<' and '>'.
--- If a '<' is found but there is no corresponding '>', the rest of the sequence is added as a single part.
--- @param sequence The sequence of keys to split.
--- @return A table containing the individual parts of the sequence.
-local function split_keys(sequence)
-		local parts = {}
-		local i = 1
-		while i <= #sequence do
-				if sequence:sub(i, i) == '<' then
-						local end_pos = sequence:find('>', i)
-						if end_pos then
-								table.insert(parts, sequence:sub(i, end_pos))
-								i = end_pos + 1
-						else
-								-- If '<' is found but there is no corresponding '>', add it as it is
-								table.insert(parts, sequence:sub(i))
-								break
-						end
-				else
-						table.insert(parts, sequence:sub(i, i))
-						i = i + 1
-				end
-		end
-		return parts
-end
-
 --- This function is responsible for handling the dynamic macro functionality in Neovim.
 -- It first determines the size of the dynamic macro key and retrieves the current state.
 -- The keys are then sliced based on the size of the dynamic macro key.
@@ -118,9 +75,8 @@ end
 -- Finally, the state is updated with the current keys and the found or guessed macro.
 -- @function _M.dmacro
 function _M.dmacro()
-		local dmacro_key_size = #(split_keys(detect_dmacro_key()))
 		local keys, macro = _M.get_state()
-		keys = vim.list_slice(keys, 1, #keys - dmacro_key_size)
+		keys = vim.list_slice(keys, 1, #keys - 1)
 		macro = macro or _M.guess_macro_1(keys)
 		if macro then
 				vim.fn.feedkeys(table.concat(macro))
@@ -147,14 +103,13 @@ function _M.setup(opts)
 	local ns_id_main = vim.api.nvim_create_namespace('dmacro_main')
 	vim.on_key(function(_, typed)
 		if typed ~= "" and typed ~= nil then
-			local dmacro_key_size = #(split_keys(detect_dmacro_key()))
 			local keys, macro = _M.get_state()
-			if keys and macro and #keys - (dmacro_key_size - 1) >= #macro then
+			if keys and macro and #keys >= #macro then
 				for i = 0, #macro - 1 do
-					local j = #keys - i - (dmacro_key_size - 1)
+					local j = #keys - i
 					local k = #macro - i
 					if keys[j] ~= macro[k] then
-						macro = nil
+						keys, macro = nil, nil
 						break
 					end
 				end
@@ -167,5 +122,11 @@ function _M.setup(opts)
 		vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, opts.dmacro_key, "<Plug>(dmacro)")
 	end
 end
+
+-- Note:
+-- 一文字分のdmacro_keyではなく、複数のキー組合せの列をdmacro_key として指定しても、
+-- vim.on_keyは、そのキー組み合わせが全て入力されたあとの一度のみに発火する。
+-- dmacro_key = "g@" の場合、"g" と "@" の間に vim.on_keyが発火することはない。
+-- "g@" が入力されたときに、"g@"が入力されたとして、ひとまとめに関数が実行される。
 
 return _M
