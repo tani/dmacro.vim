@@ -73,8 +73,8 @@ end
 -- If no macro was found in the first guess, it attempts to guess the macro again using the `guess_macro_2` function.
 -- If a macro is found in the second guess, it is fed to Neovim's input and the state is updated (with the macro set to nil).
 -- Finally, the state is updated with the current keys and the found or guessed macro.
--- @function _M.dmacro
-function _M.dmacro()
+-- @function _M.play_macro
+function _M.play_macro()
 		local keys, macro = _M.get_state()
 		keys = vim.list_slice(keys, 1, #keys - 1)
 		macro = macro or _M.guess_macro_1(keys)
@@ -117,9 +117,9 @@ function _M.setup(opts)
 			_M.set_state(vim.list_extend({ unpack(keys or {}) }, { typed }), macro)
 		end
 	end, ns_id_main)
-	vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, "<Plug>(dmacro)", _M.dmacro)
+	vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, "<Plug>(dmacro-play-macro)", _M.play_macro)
 	if opts.dmacro_key then
-		vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, opts.dmacro_key, "<Plug>(dmacro)")
+		vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, opts.dmacro_key, "<Plug>(dmacro-play-macro)")
 	end
 end
 

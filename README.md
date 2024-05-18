@@ -98,18 +98,12 @@ Or, you can use as follows:
 
 ```lua
 local dmacro = require('dmacro')
-local dmacro_key = '<C-t>'
-vim.on_key(dmacro.create_macro_recorder(dmacro_key))
-vim.keymap.set({ "i", "n" }, dmacro_key, function()
-  -- keys is a list of keys that you have typed
-  -- macro is a key sequence that you previously played
-  local keys, macro = dmacro.get_state()
-  -- Drop the first key (`dmacro_key`)
-  keys, macro = dmacro.play_macro(vim.list_slice(keys, 1, #keys - 1), macro)
-  dmacro.set_state(keys, macro)
-end)
+dmacro.setup()
+-- You can set the keymap as you like
+vim.keymap.set({ "i", "n" }, '<C-t>', dmacro.play_macro)
+-- Also, <Plug>(dmacro) is available
+vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
 ```
-
 
 ## Licence
 
