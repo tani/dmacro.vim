@@ -92,6 +92,31 @@ function _M.play_macro()
 		_M.set_state(keys, macro)
 end
 
+--- Records a macro.
+-- This function records a macro based on the typed keys. It first checks if the typed keys are not empty or nil.
+-- Then it retrieves the current state of keys and macro. If the length of keys is greater than or equal to the length of macro,
+-- it iterates over the macro and compares each key with the corresponding key in the macro.
+-- If a mismatch is found, it resets the keys and macro to nil and breaks the loop.
+-- Finally, it sets the state with the extended list of keys (or an empty list if keys is nil) and the macro.
+-- @param _ Unused parameter
+-- @param typed The keys typed by the user
+function _M.record_macro(_, typed)
+	if typed ~= "" and typed ~= nil then
+		local keys, macro = _M.get_state()
+		if keys and macro and #keys >= #macro then
+			for i = 0, #macro - 1 do
+				local j = #keys - i
+				local k = #macro - i
+				if keys[j] ~= macro[k] then
+					keys, macro = nil, nil
+					break
+				end
+			end
+		end
+		_M.set_state(vim.list_extend({ unpack(keys or {}) }, { typed }), macro)
+	end
+end
+
 --- Setup function for dmacro.
 -- This function initializes the dmacro with the provided options.
 -- If no options are provided, it uses default values.
@@ -100,23 +125,8 @@ end
 -- @param opts table containing the options for dmacro. It should have a 'dmacro_key' field.
 function _M.setup(opts)
 	opts = opts or {}
-	local ns_id_main = vim.api.nvim_create_namespace('dmacro_main')
-	vim.on_key(function(_, typed)
-		if typed ~= "" and typed ~= nil then
-			local keys, macro = _M.get_state()
-			if keys and macro and #keys >= #macro then
-				for i = 0, #macro - 1 do
-					local j = #keys - i
-					local k = #macro - i
-					if keys[j] ~= macro[k] then
-						keys, macro = nil, nil
-						break
-					end
-				end
-			end
-			_M.set_state(vim.list_extend({ unpack(keys or {}) }, { typed }), macro)
-		end
-	end, ns_id_main)
+	local ns_id = vim.api.nvim_create_namespace('dmacro_record_macro')
+	vim.on_key(_M.record_macro, ns_id)
 	vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, "<Plug>(dmacro-play-macro)", _M.play_macro)
 	if opts.dmacro_key then
 		vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, opts.dmacro_key, "<Plug>(dmacro-play-macro)")

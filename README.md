@@ -86,7 +86,8 @@ To define a macro, this plugin detects the reputation as follows:
 
 ## Usage
 
-Before loading buffers, call the `setup()` function.
+You need to call `dmacro.setup()` at the very early phase;
+e.g., `VimEnter` or `BufEnter` event to start key logging.
 
 ```lua
 require('dmacro').setup({
@@ -94,15 +95,19 @@ require('dmacro').setup({
 })
 ```
 
-Or, you can use as follows:
+Or, you can intensively use `dmacro.setup()` in the `CursorHold` event.
 
 ```lua
-local dmacro = require('dmacro')
-dmacro.setup()
--- You can set the keymap as you like
-vim.keymap.set({ "i", "n" }, '<C-t>', dmacro.play_macro)
--- Also, <Plug>(dmacro) is available
-vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
+vim.api.nvim_create_autocmd("CursorHold", {
+    callback = function()
+        local dmacro = require('dmacro')
+        dmacro.setup()
+        vim.keymap.set({ "i", "n" }, '<C-t>', dmacro.play_macro)
+        -- or
+        -- vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
+    end,
+    once = true
+})
 ```
 
 ## Licence
