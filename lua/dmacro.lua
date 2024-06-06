@@ -1,4 +1,4 @@
-local _M = {}
+local _M = { }
 
 --- Guess the macro from the keys.
 --- keys: { old --> new }, find the repeated pattern: { ..., <pattern>, <pattern> }
@@ -76,20 +76,22 @@ end
 -- @function _M.play_macro
 function _M.play_macro()
 		local keys, macro = _M.get_state()
-		keys = vim.list_slice(keys, 1, #keys - 1)
-		macro = macro or _M.guess_macro_1(keys)
-		if macro then
-				vim.fn.feedkeys(table.concat(macro))
-				_M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), macro)
-				return
+		if keys then
+			keys = vim.list_slice(keys, 1, #keys - 1)
+			macro = macro or _M.guess_macro_1(keys)
+			if macro then
+					vim.fn.feedkeys(table.concat(macro))
+					_M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), macro)
+					return
+			end
+			macro = macro or _M.guess_macro_2(keys)
+			if macro then
+					vim.fn.feedkeys(table.concat(macro))
+					_M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), nil)
+					return
+			end
+			_M.set_state(keys, macro)
 		end
-		macro = macro or _M.guess_macro_2(keys)
-		if macro then
-				vim.fn.feedkeys(table.concat(macro))
-				_M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), nil)
-				return
-		end
-		_M.set_state(keys, macro)
 end
 
 --- Records a macro.
