@@ -1,4 +1,4 @@
-# dmacro.nvim
+# dmacro.nvim / dmacro.vim
 
 > [!CAUTION]
 > - You need to use neovim **0.10.0** or later.
