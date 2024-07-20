@@ -1,4 +1,7 @@
 vim9script
+if !has('patch-9.1.0597')
+  echoerr 'Vim 9.1.0597 or later is required'
+endif
 
 export def GuessMacro1(keys: list<string>): list<string>
   # keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, len(keys) = 7
