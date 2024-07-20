@@ -1,7 +1,8 @@
 # dmacro.nvim
 
 > [!CAUTION]
-> You need to use neovim **0.10.0** or later.
+> - You need to use neovim **0.10.0** or later.
+> - You need to use vim with **patch 9.1.0597**.
 
 Text editors have evolved to support input in different ways.
 
@@ -82,27 +83,28 @@ To define a macro, this plugin detects the reputation as follows:
 
 ## Usage
 
+### Neovim
+
 You need to call `dmacro.setup()` at the very early phase;
 e.g., `VimEnter` or `BufEnter` event to start key logging.
 
 ```lua
-require('dmacro').setup({
-    dmacro_key = '<C-t>' --  you need to set the dmacro_key
-})
+require('dmacro').setup()
+vim.keymap.set({ "i", "n" }, '<C-t>', require('dmacro').play_macro)
+-- or
+vim.keymap.set({ "i", "n" }, '<C-t>', '<Plug>(dmacro-play-macro)')
 ```
 
-Or, you can intensively use `dmacro.setup()` in the `CursorHold` event.
+### Vim
 
-```lua
-vim.api.nvim_create_autocmd("CursorHold", {
-    callback = function()
-        require('dmacro').setup()
-    end,
-    once = true
-})
-vim.keymap.set({ "i", "n" }, '<C-t>', function() require('dmacro').play_macro() end)
--- vim.keymap.set({ "i", "n" }, '<C-t>', "<Plug>(dmacro-play-macro)")
--- vim.keymap.set({ "i", "n" }, '<C-t>', "<Cmd>lua require('dmacro').play_macro()<CR>")
+You need to call `dmacro.Setup()` at the very early phase;
+e.g., `VimEnter` or `BufEnter` event to start key logging.
+
+```viml
+import autoload 'dmacro.vim'
+dmacro.Setup()
+imap <C-t> <Plug>(dmacro-play-macro)
+nmap <C-t> <Plug>(dmacro-play-macro)
 ```
 
 ## Licence
