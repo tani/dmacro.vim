@@ -42,7 +42,6 @@ enddef
 export def SetState(keys: list<string>, macro: list<string>): void
   b:dmacro_keys = keys
   b:dmacro_macro = macro
-  return
 enddef
 
 export def GetState(): list<list<string>>
@@ -67,7 +66,6 @@ export def PlayMacro(): void
     endif
     SetState(keys, macro)
   endif
-  return
 enddef
 
 export def RecordMacro(typed: string): void
@@ -86,17 +84,13 @@ export def RecordMacro(typed: string): void
     endif
     SetState(extend(copy(keys), [ typed ]), macro)
   endif
-  return
 enddef
 
 export def Setup(): void
   augroup Dmacro
-  autocmd!
-  autocmd KeyInputPre * {
-    call RecordMacro(v:event.typedchar)
-  }
+    autocmd!
+    autocmd KeyInputPre * call RecordMacro(v:event.typedchar)
   augroup End
   inoremap <Plug>(dmacro-play-macro) <ScriptCmd>call PlayMacro()<CR>
-  return
 enddef
 
