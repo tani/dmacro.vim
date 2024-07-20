@@ -37,7 +37,7 @@ function _M.guess_macro_2(keys)
 			-- (2 - 2) j = 3
 			local prevspan = vim.list_slice(keys, j - #span + 1, j)
 			-- (1 - 1) prevspan = vim.list_slice(keys, 3 - 3 + 1 = 1, 3) = { 'd', 'c', 'b' }
-			-- (2 - 1) prevspan = vim.list_slice(keys, 4 - 2 + 1 = 3, 4) = { 'a', 'c' }
+			-- (2 - 1) prevspan = vim.list_slice(keys, 4 - 2 + 1 = 3, 4) = { 'b', 'a' }
 			-- (2 - 2) prevspan = vim.list_slice(keys, 3 - 2 + 1 = 2, 3) = { 'c', 'b' }
 			if vim.deep_equal(prevspan, span) then
 				-- (2 - 2) true
