@@ -16,6 +16,13 @@ elseif has('patch-9.1.0597')
     autocmd KeyInputPre * call dmacro#RecordMacro(v:event.typedchar)
   augroup End
   inoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  nnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  vnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  xnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  snoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  onoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  cnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
+  tnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
 else
   echoerr "dmacro.vim: Please upgrade to Vim 8.1.0597 or Neovim 0.4.0."
 endif
