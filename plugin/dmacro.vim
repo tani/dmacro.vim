@@ -24,5 +24,5 @@ elseif has('patch-9.1.0597')
   cnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
   tnoremap <Plug>(dmacro-play-macro) <Cmd>call dmacro#PlayMacro()<CR>
 else
-  echoerr "dmacro.vim: Please upgrade to Vim 9.1.0597 or Neovim 0.4.0."
+  echoerr "dmacro.vim: Please upgrade to Vim 9.1.0597 or Neovim 0.10.0."
 endif
