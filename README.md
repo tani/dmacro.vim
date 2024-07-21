@@ -101,6 +101,14 @@ You need to call `dmacro.Setup()` at the very early phase;
 e.g., `VimEnter` or `BufEnter` event to start key logging.
 
 ```viml
+call dmacro#Setup()
+imap <C-t> <Plug>(dmacro-play-macro)
+nmap <C-t> <Plug>(dmacro-play-macro)
+```
+
+If you prefer to use vim9script, you can use the following code:
+
+```viml
 import autoload 'dmacro.vim'
 dmacro.Setup()
 imap <C-t> <Plug>(dmacro-play-macro)
