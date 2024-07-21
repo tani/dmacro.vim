@@ -90,8 +90,8 @@ vim.keymap.set({ "i", "n" }, '<C-y>', '<Plug>(dmacro-play-macro)')
 ```
 
 ```viml
-imap <C-y> <Plug>(dmacro-play-macro)
-nmap <C-y> <Plug>(dmacro-play-macro)
+inoremap <C-y> <Plug>(dmacro-play-macro)
+nnoremap <C-y> <Plug>(dmacro-play-macro)
 ```
 
 ## Licence
