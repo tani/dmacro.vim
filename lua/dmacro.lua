@@ -120,25 +120,8 @@ function _M.record_macro(_, typed)
 end
 
 --- Setup function for dmacro.
--- This function initializes the dmacro with the provided options.
--- If no options are provided, it uses default values.
--- If the 'dmacro_key' option is not provided, it prints a warning message.
--- It sets up a keymap for the 'dmacro_key' to play the macro.
--- @param opts table containing the options for dmacro. It should have a 'dmacro_key' field.
 function _M.setup(opts)
-	opts = opts or {}
-	local ns_id = vim.api.nvim_create_namespace('dmacro_record_macro')
-	vim.on_key(_M.record_macro, ns_id)
-	vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, "<Plug>(dmacro-play-macro)", _M.play_macro)
-	if opts.dmacro_key then
-		vim.keymap.set({ "i", "n", "v", "x", "s", "o", "c", "t" }, opts.dmacro_key, "<Plug>(dmacro-play-macro)")
-	end
+	vim.echomsg("dmacro: dmacro.setup() is obsolete, use vim.keymap.set() directly.")
 end
-
--- Note:
--- 一文字分のdmacro_keyではなく、複数のキー組合せの列をdmacro_key として指定しても、
--- vim.on_keyは、そのキー組み合わせが全て入力されたあとの一度のみに発火する。
--- dmacro_key = "g@" の場合、"g" と "@" の間に vim.on_keyが発火することはない。
--- "g@" が入力されたときに、"g@"が入力されたとして、ひとまとめに関数が実行される。
 
 return _M

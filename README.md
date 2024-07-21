@@ -83,36 +83,15 @@ To define a macro, this plugin detects the reputation as follows:
 
 ## Usage
 
-### Neovim
-
-You need to call `dmacro.setup()` at the very early phase;
-e.g., `VimEnter` or `BufEnter` event to start key logging.
+You need to bind the `<Plug>(dmacro-play-macro)` to a key sequence.
 
 ```lua
-require('dmacro').setup()
-vim.keymap.set({ "i", "n" }, '<C-t>', require('dmacro').play_macro)
--- or
-vim.keymap.set({ "i", "n" }, '<C-t>', '<Plug>(dmacro-play-macro)')
+vim.keymap.set({ "i", "n" }, '<C-y>', '<Plug>(dmacro-play-macro)')
 ```
 
-### Vim
-
-You need to call `dmacro.Setup()` at the very early phase;
-e.g., `VimEnter` or `BufEnter` event to start key logging.
-
 ```viml
-call dmacro#Setup()
-imap <C-t> <Plug>(dmacro-play-macro)
-nmap <C-t> <Plug>(dmacro-play-macro)
-```
-
-If you prefer to use vim9script, you can use the following code:
-
-```viml
-import autoload 'dmacro.vim'
-dmacro.Setup()
-imap <C-t> <Plug>(dmacro-play-macro)
-nmap <C-t> <Plug>(dmacro-play-macro)
+imap <C-y> <Plug>(dmacro-play-macro)
+nmap <C-y> <Plug>(dmacro-play-macro)
 ```
 
 ## Licence

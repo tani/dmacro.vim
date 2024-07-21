@@ -1,7 +1,4 @@
 vim9script
-if !has('patch-9.1.0597')
-  echoerr 'Vim 9.1.0597 or later is required'
-endif
 
 export def GuessMacro1(keys: list<string>): list<string>
   # keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, len(keys) = 7
@@ -88,12 +85,3 @@ export def RecordMacro(typed: string): void
     SetState(extend(copy(keys), [ typed ]), macro)
   endif
 enddef
-
-export def Setup(): void
-  augroup Dmacro
-    autocmd!
-    autocmd KeyInputPre * call RecordMacro(v:event.typedchar)
-  augroup End
-  inoremap <Plug>(dmacro-play-macro) <ScriptCmd>call PlayMacro()<CR>
-enddef
-
