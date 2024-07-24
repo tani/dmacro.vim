@@ -121,7 +121,7 @@ end
 
 --- Setup function for dmacro.
 function _M.setup(opts)
-	vim.echomsg("dmacro: dmacro.setup() is obsolete, use vim.keymap.set() directly.")
+	vim.notify("dmacro: dmacro.setup() is obsolete, use vim.keymap.set() directly.", vim.log.levels.WARN)
 end
 
 return _M
