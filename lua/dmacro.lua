@@ -1,20 +1,38 @@
 --- @class dmacro
 local _M = {}
 
+--- Compare whether two spans within a given list are equal.
+--- @param list any[]: The list containing the spans.
+--- @param start1 integer: A start index of the first span.
+--- @param start2 integer: A start index of the second span.
+--- @param len integer: The length of the spans to compare.
+--- @return boolean: `true` if the spans are equal.
+function _M.span_equal(list, start1, start2, len)
+  for i = 0, len - 1 do
+    if list[start1 + i] ~= list[start2 + i] then
+      return false
+    end
+  end
+  return true
+end
+
 --- Guess the macro from the keys.
 --- keys: { old --> new }, find the repeated pattern: { ..., <pattern>, <pattern> }
 --- @param keys string[]: A table of keys to guess the macro from.
 --- @return string[]? macro: A table representing the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_1(keys)
-  -- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }, #keys = 7
-  for i = math.ceil(#keys / 2), #keys - 1 do
-    -- (1) i = math.ceil(#keys / 2) = 4
-    local span1 = vim.list_slice(keys, i + 1, #keys)
-    -- (1) span1 =  { 'c', 'b', 'a' }
-    local span2 = vim.list_slice(keys, i + 1 - #span1, i)
-    -- (1) span2 = { 'c', 'b', 'a' }
-    if vim.deep_equal(span1, span2) then
-      return span1
+  -- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
+  local keys_len = #keys -- 7
+  for pat_start = math.ceil(keys_len / 2) + 1, keys_len do
+    -- (1) pat_start = math.ceil(#keys / 2) + 1 = 5
+    local pat_len = keys_len - pat_start + 1
+    -- (1) pat_len = 3
+    local prevpat_start = pat_start - pat_len
+    -- (1) prevpat_start = 2
+    if _M.span_equal(keys, prevpat_start, pat_start, pat_len) then
+      -- (1) keys[2] == keys[5] and ... and keys[4] == keys[7] = true
+      return vim.list_slice(keys, pat_start, keys_len)
+      -- (1) vim.list_slice(keys, 5, 7) = { 'c', 'b', 'a' }
     end
   end
   return nil
@@ -25,25 +43,27 @@ end
 --- @param keys string[]: A table of keys to guess the macro from.
 --- @return string[]? macro: A table representing the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_2(keys)
-  -- keys = { 'd', 'c', 'b', 'a', 'c', 'b' }, #keys = 6
-  for i = math.ceil(#keys / 2), #keys do
-    -- (1) i = math.ceil(#keys / 2) = 3
-    -- (2) i = 4
-    local span = vim.list_slice(keys, i + 1, #keys)
-    -- (1) span = { 'a', 'c', 'b' }
-    -- (2) span = { 'c', 'b' }
-    for j = i, #span, -1 do
-      -- (1 - 1) j = 3
-      -- (2 - 1) j = 4
-      -- (2 - 2) j = 3
-      local prevspan = vim.list_slice(keys, j - #span + 1, j)
-      -- (1 - 1) prevspan = vim.list_slice(keys, 3 - 3 + 1 = 1, 3) = { 'd', 'c', 'b' }
-      -- (2 - 1) prevspan = vim.list_slice(keys, 4 - 2 + 1 = 3, 4) = { 'b', 'a' }
-      -- (2 - 2) prevspan = vim.list_slice(keys, 3 - 2 + 1 = 2, 3) = { 'c', 'b' }
-      if vim.deep_equal(prevspan, span) then
-        -- (2 - 2) true
-        return vim.list_slice(keys, j + 1, i)
-        -- (2 - 2) vim.list_slice(keys, 3 + 1 = 4, 4) = { 'a' }
+  -- keys = { 'd', 'c', 'b', 'a', 'c', 'b' }
+  local keys_len = #keys -- 6
+  for pat_start = math.ceil(keys_len / 2) + 1, keys_len do
+    -- (1) pat_start = math.ceil(#keys / 2) + 1 = 4
+    -- (2) pat_start = 5
+    local cmp_finish = pat_start - 1
+    -- (1) cmp_finish = 3
+    -- (2) cmp_finish = 4
+    local pat_len = keys_len - cmp_finish
+    -- (1) pat_len = 3
+    -- (2) pat_len = 2
+    for cmp_start = cmp_finish, pat_len + 1, -1 do
+      -- (2 - 1) cmp_start = 4
+      -- (2 - 2) cmp_start = 3
+      local prevpat_start = cmp_start - pat_len
+      -- (2 - 1) prevpat_start = 2
+      -- (2 - 2) prevpat_start = 1
+      if _M.span_equal(keys, prevpat_start, pat_start, pat_len) then
+        -- (2 - 2) keys[2] == keys[5] and keys[3] == keys[6] = true
+        return vim.list_slice(keys, cmp_start, cmp_finish)
+        -- (2 - 2) vim.list_slice(keys, 4, 4) = { 'a' }
       end
     end
   end
@@ -78,7 +98,7 @@ end
 function _M.play_macro()
   local keys, macro = _M.get_state()
   if keys then
-    keys = vim.list_slice(keys, 1, #keys - 1)
+    table.remove(keys)
     macro = macro or _M.guess_macro_1(keys)
     if macro then
       vim.fn.feedkeys(table.concat(macro))

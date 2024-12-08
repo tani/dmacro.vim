@@ -1,6 +1,8 @@
 local dmacro = require('./lua/dmacro')
 
-function test(name, func)
+--- @param name string
+--- @param func fun()
+local function test(name, func)
   print('Test: ' .. name .. ' started')
   func()
   print('Test: ' .. name .. ' passed')
@@ -36,4 +38,10 @@ test('get_and_set_state', function()
   local actual_keys, actual_macro = dmacro.get_state()
   assert(vim.deep_equal(expected_keys, actual_keys))
   assert(vim.deep_equal(expected_macro, actual_macro))
+end)
+
+test('span_equal', function()
+  local keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
+  assert(dmacro.span_equal(keys, 2, 5, 3))
+  assert(not dmacro.span_equal(keys, 1, 5, 3))
 end)
