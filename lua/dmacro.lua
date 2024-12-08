@@ -70,21 +70,34 @@ function _M.guess_macro_2(keys)
   return nil
 end
 
---- Set the current state of dmacro.
--- This function sets the current keys and previous macro of dmacro in the buffer.
---- @param keys string[]?: The keys you have typed.
---- @param macro string[]?: The previous macro to be set.
-function _M.set_state(keys, macro)
-  vim.b.dmacro_keys = keys
-  vim.b.dmacro_macro = macro
-end
+do
+  --- @type table<integer, { keys: string[]?, macro: string[]? }>
+  local buf_states = {}
+  vim.api.nvim_create_autocmd('BufDelete', {
+    group = vim.api.nvim_create_augroup('Dmacro', { clear = true }),
+    callback = function(cx)
+      buf_states[cx.buf] = nil
+    end,
+  })
 
---- Get the current state of dmacro.
--- This function retrieves the current keys and previous macro of dmacro from the buffer.
---- @return string[]? keys: The keys you have typed.
---- @return string[]? macro: The previous macro to be set.
-function _M.get_state()
-  return vim.b.dmacro_keys, vim.b.dmacro_macro
+  --- Set the current state of dmacro.
+  -- This function sets the current keys and previous macro of dmacro in the buffer.
+  --- @param keys string[]?: The keys you have typed.
+  --- @param macro string[]?: The previous macro to be set.
+  function _M.set_state(keys, macro)
+    buf_states[vim.api.nvim_get_current_buf()] = { keys = keys, macro = macro }
+  end
+
+  --- Get the current state of dmacro.
+  -- This function retrieves the current keys and previous macro of dmacro from the buffer.
+  --- @return string[]? keys: The keys you have typed.
+  --- @return string[]? macro: The previous macro to be set.
+  function _M.get_state()
+    local state = buf_states[vim.api.nvim_get_current_buf()]
+    if state then
+      return state.keys, state.macro
+    end
+  end
 end
 
 --- This function is responsible for handling the dynamic macro functionality in Neovim.

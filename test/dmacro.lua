@@ -36,8 +36,8 @@ test('get_and_set_state', function()
   local expected_macro = macro
   dmacro.set_state(keys, macro)
   local actual_keys, actual_macro = dmacro.get_state()
-  assert(vim.deep_equal(expected_keys, actual_keys))
-  assert(vim.deep_equal(expected_macro, actual_macro))
+  assert(expected_keys == actual_keys)
+  assert(expected_macro == actual_macro)
 end)
 
 test('span_equal', function()
