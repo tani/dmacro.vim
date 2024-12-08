@@ -82,13 +82,13 @@ function _M.play_macro()
     macro = macro or _M.guess_macro_1(keys)
     if macro then
       vim.fn.feedkeys(table.concat(macro))
-      _M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), macro)
+      _M.set_state(vim.list_extend(keys, macro), macro)
       return
     end
     macro = macro or _M.guess_macro_2(keys)
     if macro then
       vim.fn.feedkeys(table.concat(macro))
-      _M.set_state(vim.list_extend({ unpack(keys) }, { unpack(macro) }), nil)
+      _M.set_state(vim.list_extend(keys, macro), nil)
       return
     end
     _M.set_state(keys, macro)
@@ -116,7 +116,7 @@ function _M.record_macro(_, typed)
         end
       end
     end
-    _M.set_state(vim.list_extend({ unpack(keys or {}) }, { typed }), macro)
+    _M.set_state(vim.list_extend(keys or {}, { typed }), macro)
   end
 end
 
