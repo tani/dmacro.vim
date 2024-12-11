@@ -94,6 +94,17 @@ inoremap <C-y> <Plug>(dmacro-play-macro)
 nnoremap <C-y> <Plug>(dmacro-play-macro)
 ```
 
+Install the plugin with [lazy.nvim](https://github.com/folke/lazy.nvim)
+```lua
+{
+  "tani/dmacro.vim",
+  event = "VeryLazy",
+  keys = {
+    { "<c-y>", mode = { "n", "i" }, "<Plug>(dmacro-play-macro)" }
+  },
+}
+```
+
 ## Licence
 
 This software is released under the MIT licence.
