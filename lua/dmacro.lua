@@ -16,10 +16,15 @@ function _M.span_equal(list, start1, start2, len)
   return true
 end
 
+--- A type that represents an inclusive range.
+--- @class dmacro.Range
+--- @field [1] integer: Start index
+--- @field [2] integer: Final index
+
 --- Guess the macro from the keys.
 --- keys: { old --> new }, find the repeated pattern: { ..., <pattern>, <pattern> }
 --- @param keys string[]: A table of keys to guess the macro from.
---- @return string[]? macro: A table representing the guessed macro, or nil if no macro could be guessed.
+--- @return dmacro.Range? macro: A range pointing to the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_1(keys)
   -- keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
   local keys_len = #keys -- 7
@@ -31,8 +36,8 @@ function _M.guess_macro_1(keys)
     -- (1) prevpat_start = 2
     if _M.span_equal(keys, prevpat_start, pat_start, pat_len) then
       -- (1) keys[2] == keys[5] and ... and keys[4] == keys[7] = true
-      return vim.list_slice(keys, pat_start, keys_len)
-      -- (1) vim.list_slice(keys, 5, 7) = { 'c', 'b', 'a' }
+      return { pat_start, keys_len } --- @type dmacro.Range
+      -- (1) { keys[5], ..., keys[7] } = { 'c', 'b', 'a' }
     end
   end
   return nil
@@ -41,7 +46,7 @@ end
 --- Guess the macro from the keys.
 --- keys: { old --> new }, find the completion between repeated pattern: { ..., <pattern>, <completion>, <pattern> }
 --- @param keys string[]: A table of keys to guess the macro from.
---- @return string[]? macro: A table representing the guessed macro, or nil if no macro could be guessed.
+--- @return dmacro.Range? macro: A range pointing to the guessed macro, or nil if no macro could be guessed.
 function _M.guess_macro_2(keys)
   -- keys = { 'd', 'c', 'b', 'a', 'c', 'b' }
   local keys_len = #keys -- 6
@@ -62,8 +67,8 @@ function _M.guess_macro_2(keys)
       -- (2 - 2) prevpat_start = 1
       if _M.span_equal(keys, prevpat_start, pat_start, pat_len) then
         -- (2 - 2) keys[2] == keys[5] and keys[3] == keys[6] = true
-        return vim.list_slice(keys, cmp_start, cmp_finish)
-        -- (2 - 2) vim.list_slice(keys, 4, 4) = { 'a' }
+        return { cmp_start, cmp_finish } --- @type dmacro.Range
+        -- (2 - 2) { keys[4] } = { 'a' }
       end
     end
   end
@@ -71,7 +76,7 @@ function _M.guess_macro_2(keys)
 end
 
 do
-  --- @type table<integer, { keys: string[]?, macro: string[]? }>
+  --- @type table<integer, { keys: string[]?, macro: dmacro.Range? }>
   local buf_states = {}
   vim.api.nvim_create_autocmd('BufDelete', {
     group = vim.api.nvim_create_augroup('Dmacro', { clear = true }),
@@ -83,7 +88,7 @@ do
   --- Set the current state of dmacro.
   -- This function sets the current keys and previous macro of dmacro in the buffer.
   --- @param keys string[]?: The keys you have typed.
-  --- @param macro string[]?: The previous macro to be set.
+  --- @param macro dmacro.Range?: A range pointing to the previous macro to be set.
   function _M.set_state(keys, macro)
     buf_states[vim.api.nvim_get_current_buf()] = { keys = keys, macro = macro }
   end
@@ -91,7 +96,7 @@ do
   --- Get the current state of dmacro.
   -- This function retrieves the current keys and previous macro of dmacro from the buffer.
   --- @return string[]? keys: The keys you have typed.
-  --- @return string[]? macro: The previous macro to be set.
+  --- @return dmacro.Range? macro: A range pointing to the previous macro to be set.
   function _M.get_state()
     local state = buf_states[vim.api.nvim_get_current_buf()]
     if state then
@@ -101,12 +106,11 @@ do
 end
 
 --- This function is responsible for handling the dynamic macro functionality in Neovim.
--- It first determines the size of the dynamic macro key and retrieves the current state.
--- The keys are then sliced based on the size of the dynamic macro key.
+-- It first retrieves the current state and then removes the last key typed.
 -- If a macro is not already defined, it attempts to guess the macro using the `guess_macro_1` function.
--- If a macro is found or guessed, it is then fed to Neovim's input and the state is updated.
+-- If a macro is found or guessed, it is then fed to Neovim's input.
 -- If no macro was found in the first guess, it attempts to guess the macro again using the `guess_macro_2` function.
--- If a macro is found in the second guess, it is fed to Neovim's input and the state is updated (with the macro set to nil).
+-- If a macro is found in the second guess, it is fed to Neovim's input.
 -- Finally, the state is updated with the current keys and the found or guessed macro.
 function _M.play_macro()
   local keys, macro = _M.get_state()
@@ -114,40 +118,43 @@ function _M.play_macro()
     table.remove(keys)
     macro = macro or _M.guess_macro_1(keys)
     if macro then
-      vim.fn.feedkeys(table.concat(macro))
-      _M.set_state(vim.list_extend(keys, macro), macro)
+      vim.fn.feedkeys(table.concat(keys, nil, macro[1], macro[2]))
+      _M.set_state(vim.list_extend(keys, keys, macro[1], macro[2]), macro)
       return
     end
     macro = macro or _M.guess_macro_2(keys)
     if macro then
-      vim.fn.feedkeys(table.concat(macro))
-      _M.set_state(vim.list_extend(keys, macro), nil)
+      vim.fn.feedkeys(table.concat(keys, nil, macro[1], macro[2]))
+      _M.set_state(vim.list_extend(keys, keys, macro[1], macro[2]), nil)
       return
     end
     _M.set_state(keys, macro)
   end
 end
 
+--- Checks if the `keys` has a suffix that matches the previously used macro.
+--- @param macro dmacro.Range
+--- @param keys string[]
+--- @return boolean
+function _M.has_prev_macro_suffix(macro, keys)
+  local macro_start = macro[1]
+  local macro_len = macro[2] - macro[1] + 1
+  local suffix_start = #keys - macro_len + 1
+  return _M.span_equal(keys, macro_start, suffix_start, macro_len)
+end
+
 --- Records a macro.
 -- This function records a macro based on the typed keys. It first checks if the typed keys are not empty or nil.
--- Then it retrieves the current state of keys and macro. If the length of keys is greater than or equal to the length of macro,
--- it iterates over the macro and compares each key with the corresponding key in the macro.
--- If a mismatch is found, it resets the keys and macro to nil and breaks the loop.
+-- Then it retrieves the current state of the keys and the range pointing to a macro. If the macro is not valid,
+-- it resets the keys and the range to nil.
 -- Finally, it sets the state with the extended list of keys (or an empty list if keys is nil) and the macro.
 --- @param _ any: Unused parameter
 --- @param typed string: The keys typed by the user
 function _M.record_macro(_, typed)
   if typed ~= '' and typed ~= nil then
     local keys, macro = _M.get_state()
-    if keys and macro and #keys >= #macro then
-      for i = 0, #macro - 1 do
-        local j = #keys - i
-        local k = #macro - i
-        if keys[j] ~= macro[k] then
-          keys, macro = nil, nil
-          break
-        end
-      end
+    if keys and macro and not _M.has_prev_macro_suffix(macro, keys) then
+      keys, macro = nil, nil
     end
     _M.set_state(vim.list_extend(keys or {}, { typed }), macro)
   end
