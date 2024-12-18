@@ -76,21 +76,17 @@ function _M.guess_macro_2(keys)
 end
 
 do
-  --- @type table<integer, { keys: string[]?, macro: dmacro.Range? }>
-  local buf_states = {}
-  vim.api.nvim_create_autocmd('BufDelete', {
-    group = vim.api.nvim_create_augroup('Dmacro', { clear = true }),
-    callback = function(cx)
-      buf_states[cx.buf] = nil
-    end,
-  })
+  ---@type string[]?
+  local dmacro_keys = nil
+  ---@type dmacro.Range?
+  local dmacro_macro = nil
 
   --- Set the current state of dmacro.
   -- This function sets the current keys and previous macro of dmacro in the buffer.
   --- @param keys string[]?: The keys you have typed.
   --- @param macro dmacro.Range?: A range pointing to the previous macro to be set.
   function _M.set_state(keys, macro)
-    buf_states[vim.api.nvim_get_current_buf()] = { keys = keys, macro = macro }
+    dmacro_keys, dmacro_macro = keys, macro
   end
 
   --- Get the current state of dmacro.
@@ -98,10 +94,7 @@ do
   --- @return string[]? keys: The keys you have typed.
   --- @return dmacro.Range? macro: A range pointing to the previous macro to be set.
   function _M.get_state()
-    local state = buf_states[vim.api.nvim_get_current_buf()]
-    if state then
-      return state.keys, state.macro
-    end
+    return dmacro_keys, dmacro_macro
   end
 end
 

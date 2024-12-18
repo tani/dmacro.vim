@@ -40,12 +40,12 @@ export def GuessMacro2(keys: list<string>): list<string>
 enddef
 
 export def SetState(keys: list<string>, macro: list<string>): void
-  b:dmacro_keys = keys
-  b:dmacro_macro = macro
+  g:dmacro_keys = keys
+  g:dmacro_macro = macro
 enddef
 
 export def GetState(): list<list<string>>
-  return [get(b:, 'dmacro_keys', []), get(b:, 'dmacro_macro', [])]
+  return [get(g:, 'dmacro_keys', []), get(g:, 'dmacro_macro', [])]
 enddef
 
 export def PlayMacro(): void
