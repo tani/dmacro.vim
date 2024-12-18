@@ -29,13 +29,13 @@ test('guess_macro_2:ok', function()
   assert(vim.deep_equal(expected, actual))
 end)
 
-test('is_macro_still_valid:ok', function ()
+test('has_prev_macro_suffix:true', function()
   local keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
   local macro = { 2, 4 }
   assert(dmacro.has_prev_macro_suffix(macro, keys))
 end)
 
-test('is_macro_still_valid:ng', function ()
+test('has_prev_macro_suffix:false', function()
   local keys = { 'd', 'c', 'b', 'a', 'c', 'b', 'a' }
   local macro = { 2, 3 }
   assert(not dmacro.has_prev_macro_suffix(macro, keys))
